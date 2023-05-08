@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.awt.Font;
 import java.io.*;
 import java.util.*;
+import java.lang.Math;
 
 
 public class App extends PApplet {
@@ -30,6 +31,7 @@ public class App extends PApplet {
 	
     public String configPath;
     private Board board;
+    private Logic logic;
 
 
     public App() {
@@ -50,99 +52,102 @@ public class App extends PApplet {
         frameRate(FPS);
 
         // Load images during setup
+        this.board = new Board(this);
+        this.logic = new Logic(this, board);
         try {
             File file = new File("level1.txt");
             Scanner scan = new Scanner(file);
-            this.board = new Board(this);
-            for (int i=0; i<14; i++) {
+            int i = 0;
+            while (scan.hasNextLine()) {
+                if (i==14) {
+                    System.out.println("Incorrect board");
+                    System.exit(0);
+                }
                 String line = scan.nextLine();
-                assert line.length() != 14: "Wrong board initial setup";
-                    for (int j=0; j<14; j++) {
-                    if (line == "\n") {
-                        board.board_tiles[i][j] = new Tile(this, i, j, null);
-                    // } else if (line.charAt(j) == 'P') {
-                        // PImage img = loadImage("src/main/resources/XXLChess/b-pawn.png");
-                        // Piece setuppiece = new Pawn(false, img);
-                        // board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                        // System.out.println("Correct");
-                //     } else if (line.charAt(j) == 'p') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-pawn.png");
-                //         Piece setuppiece = new Pawn(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'R') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-rook.png");
-                //         Piece setuppiece = new Rook(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'r') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-rook.png");
-                //         Piece setuppiece = new Rook(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'N') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-knight.png");
-                //         Piece setuppiece = new Knight(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'n') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-knight.png");
-                //         Piece setuppiece = new Knight(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'B') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-bishop.png");
-                //         Piece setuppiece = new Bishop(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'b') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-bishop.png");
-                //         Piece setuppiece = new Bishop(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'H') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-archbishop.png");
-                //         Piece setuppiece = new Archbishop(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'h') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-archbishop.png");
-                //         Piece setuppiece = new Archbishop(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'C') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-camel.png");
-                //         Piece setuppiece = new Camel(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'c') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-camel.png");
-                //         Piece setuppiece = new Camel(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'G') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-knight-king.png");
-                //         Piece setuppiece = new Guard(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'g') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-knight-king.png");
-                //         Piece setuppiece = new Guard(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'A') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-amazon.png");
-                //         Piece setuppiece = new Amazon(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'a') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-amazon.png");
-                //         Piece setuppiece = new Amazon(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'K') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-king.png");
-                //         Piece setuppiece = new King(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'k') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-king.png");
-                //         Piece setuppiece = new King(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'E') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/b-chancellor.png");
-                //         Piece setuppiece = new Chancellor(false, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                //     } else if (line.charAt(j) == 'e') {
-                //         PImage img = loadImage("src/main/resources/XXLChess/w-chancellor.png");
-                //         Piece setuppiece = new Chancellor(true, img);
-                //         board.board_tiles[i][j] = new Tile(this, i, j, setuppiece);
-                    } 
-                } 
+                for (int j = 0; j < line.length(); j++) {
+                    if (line.charAt(j) == 'P') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-pawn.png");
+                        Piece setuppiece = new Pawn(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'p') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-pawn.png");
+                        Piece setuppiece = new Pawn(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'R') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-rook.png");
+                        Piece setuppiece = new Rook(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'r') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-rook.png");
+                        Piece setuppiece = new Rook(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'N') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-knight.png");
+                        Piece setuppiece = new Knight(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'n') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-knight.png");
+                        Piece setuppiece = new Knight(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'B') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-bishop.png");
+                        Piece setuppiece = new Bishop(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'b') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-bishop.png");
+                        Piece setuppiece = new Bishop(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'H') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-archbishop.png");
+                        Piece setuppiece = new Archbishop(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'h') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-archbishop.png");
+                        Piece setuppiece = new Archbishop(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'C') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-camel.png");
+                        Piece setuppiece = new Camel(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'c') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-camel.png");
+                        Piece setuppiece = new Camel(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'G') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-knight-king.png");
+                        Piece setuppiece = new Guard(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'g') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-knight-king.png");
+                        Piece setuppiece = new Guard(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'A') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-amazon.png");
+                        Piece setuppiece = new Amazon(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'a') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-amazon.png");
+                        Piece setuppiece = new Amazon(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'K') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-king.png");
+                        Piece setuppiece = new King(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'k') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-king.png");
+                        Piece setuppiece = new King(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'E') {
+                        PImage img = loadImage("src/main/resources/XXLChess/b-chancellor.png");
+                        Piece setuppiece = new Chancellor(false, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    } else if (line.charAt(j) == 'e') {
+                        PImage img = loadImage("src/main/resources/XXLChess/w-chancellor.png");
+                        Piece setuppiece = new Chancellor(true, img);
+                        board.board_tiles[i][j].setPiece(setuppiece);
+                    }
+                }
+                i++;
             }
         } catch (FileNotFoundException e) {
             System.out.println("Error");
@@ -172,9 +177,13 @@ public class App extends PApplet {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        // mouseX
-        // mouseY
+    public void mousePressed(MouseEvent e) {
+        int X = (int) Math.floor(mouseX/CELLSIZE);
+        int Y = (int) Math.floor(mouseY/CELLSIZE);
+        
+        if (X >=0 && X<14 && Y>=0 && Y<14) {
+            logic.Clicked(Y,X);
+        }
     }
 
     @Override
@@ -186,10 +195,7 @@ public class App extends PApplet {
      * Draw all elements in the game by current frame. 
     */
     public void draw() {
-        // board.draw(this);
-        rect(3,3,CELLSIZE,CELLSIZE);
-        PImage img = loadImage("src/main/resources/XXLChess/b-pawn.png");
-        image(img,0,0);
+        board.draw(this);
     }
 	
 	// Add any additional methods or attributes you want. Please put classes in different files.

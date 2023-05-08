@@ -14,6 +14,7 @@ public class Amazon extends Piece{
         if (!end.isValidTile() || !start.isValidTile()) {
             return false;
         }
+        // return KnightCanMove(board, start, end);
         return KnightCanMove(board, start, end) || BishopCanMove(board, start, end) || RookCanMove(board, start, end);
     }
     

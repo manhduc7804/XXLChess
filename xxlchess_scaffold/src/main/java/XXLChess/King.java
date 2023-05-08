@@ -15,14 +15,16 @@ public class King extends Piece{
             return false;
         }
 
-        if (end.getPiece().isWhite() == white) {
-            return false;
+        if (end.hasPiece()) {
+            if (end.getPiece().isWhite() == white) {
+                return false;
+            }
         }
 
         int moveX = Math.abs(end.getX()-start.getX());
         int moveY = Math.abs(end.getY()-start.getY());
 
-        if ((Math.abs(moveX) + Math.abs(moveY) == 1) || ((Math.abs(moveX) + Math.abs(moveY) == 2)) ) {
+        if (moveX == 1 && moveY == 1 || moveX + moveY == 1) {
             return true;
         }
         return false;

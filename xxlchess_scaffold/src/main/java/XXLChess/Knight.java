@@ -15,6 +15,9 @@ public class Knight extends Piece{
     
     //checking valid move
     public boolean canMove(Board board, Tile start, Tile end) {
+        if (!end.isValidTile() || !start.isValidTile()) {
+            return false;
+        }
         return KnightCanMove(board, start, end);
     }
 }

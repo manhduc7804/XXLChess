@@ -7,8 +7,8 @@ import java.lang.Math;
 
 public abstract class Piece {
     
-    protected boolean killed = false;
-    protected static boolean white = false;
+    protected final boolean killed = false;
+    protected final boolean white;
     protected PImage img;
 
     // Contructor
@@ -35,48 +35,111 @@ public abstract class Piece {
     public abstract boolean canMove(Board board, Tile start, Tile end);
     
     // Knight legal move
-    protected static boolean KnightCanMove(Board board, Tile start, Tile end) {
+    protected boolean KnightCanMove(Board board, Tile start, Tile end) {
          // check if the end tile is the same piece color or not
-        if (end.getPiece().isWhite() == white) {
-            return false;
+        if (end.hasPiece()) {
+            if (end.getPiece().isWhite() == this.white) {
+                return false;
+            }
         }
 
         int moveX = Math.abs(end.getX()-start.getX());
         int moveY = Math.abs(end.getY()-start.getY());
 
-        if (Math.abs(moveX) * Math.abs(moveY) == 2) {
+        if (moveX * moveY == 2) {
             return true;
         }
         return false;
     }
 
     // Bishop legal move
-    protected static boolean BishopCanMove(Board board, Tile start, Tile end) {
-        if (end.getPiece().isWhite() == white) {
-            return false;
+    protected boolean BishopCanMove(Board board, Tile start, Tile end) {
+        if (end.hasPiece()) {
+            if (end.getPiece().isWhite() == this.white) {
+                return false;
+            }
         }
 
-        int moveX = Math.abs(end.getX()-start.getX());
-        int moveY = Math.abs(end.getY()-start.getY());
+        int moveX = end.getX()-start.getX();
+        int moveY = end.getY()-start.getY();
 
-        if (Math.abs(moveX) == Math.abs(moveY)) {
+        if (moveX == moveY) {
+            // check if there is a blocking piece
+            if (moveX>0) {
+                for (int block=start.getX()+1; block < end.getX(); block++) {
+                    if (board.board_tiles[block][block].hasPiece()) {
+                        return false;
+                    }
+                }
+            } else {
+                for (int block=start.getX()-1; block > end.getX(); block--) {
+                    if (board.board_tiles[block][block].hasPiece()) {
+                        return false;
+                    }
+                }
+            }
             return true;
+        } else if (moveX == -moveY) {
+            if (moveX>0) {
+                for (int block = 1; block<moveX; block++) {
+                    if (board.board_tiles[start.getX()+block][start.getY()-block].hasPiece()) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            for (int block = 1; block<moveY; block++) {
+                if (board.board_tiles[start.getX()-block][start.getY()+block].hasPiece()) {
+                    return false;
+                }
+            }
         }
         return false;
     }
 
     // Rook legal move
     public boolean RookCanMove(Board board, Tile start, Tile end) {
-        if (end.getPiece().isWhite() == white) {
-            return false;
+        if (end.hasPiece()) {
+            if (end.getPiece().isWhite() == this.white) {
+                return false;
+            }
         }
 
-        int moveX = Math.abs(end.getX()-start.getX());
-        int moveY = Math.abs(end.getY()-start.getY());
+        int moveX = end.getX()-start.getX();
+        int moveY = end.getY()-start.getY();
 
-        if (Math.abs(moveX) + Math.abs(moveY) == 1) {
+        if (moveX == 0) {
+            if (moveY>0) {
+                for (int block=start.getY()+1; block < end.getY(); block++) {
+                    if (board.board_tiles[start.getX()][block].hasPiece()) {
+                        return false;
+                    }
+                }
+            } else {
+                for (int block=start.getY()-1; block > end.getY(); block--) {
+                    if (board.board_tiles[start.getX()][block].hasPiece()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else if (moveY == 0) {
+            if (moveX>0) {
+                for (int block=start.getX()+1; block < end.getX(); block++) {
+                    if (board.board_tiles[block][start.getY()].hasPiece()) {
+                        return false;
+                    }
+                }
+            } else {
+                for (int block=start.getX()-1; block > end.getX(); block--) {
+                    if (board.board_tiles[block][start.getY()].hasPiece()) {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
+
         return false;
     }
 }
