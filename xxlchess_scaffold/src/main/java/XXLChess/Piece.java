@@ -10,11 +10,13 @@ public abstract class Piece {
     protected final boolean killed = false;
     protected final boolean white;
     protected PImage img;
+    protected boolean firstmove;
 
     // Contructor
     public Piece (boolean white, PImage img) {
         this.white = white;
         this.img = img;
+        firstmove = true;
     }
 
     // Set and return if the piece is white or not
@@ -30,6 +32,14 @@ public abstract class Piece {
     // return image
     public PImage getimg() {
         return this.img;
+    }
+
+    public boolean IsFisrtMove() {
+        return firstmove;
+    }
+
+    public void setFirstMove(boolean firstmove) {
+        this.firstmove = firstmove;
     }
 
     public abstract boolean canMove(Board board, Tile start, Tile end);
@@ -66,14 +76,14 @@ public abstract class Piece {
         if (moveX == moveY) {
             // check if there is a blocking piece
             if (moveX>0) {
-                for (int block=start.getX()+1; block < end.getX(); block++) {
-                    if (board.board_tiles[block][block].hasPiece()) {
+                for (int block=1; block < moveX; block++) {
+                    if (board.board_tiles[start.getX()+block][start.getY()+block].hasPiece()) {
                         return false;
                     }
                 }
             } else {
-                for (int block=start.getX()-1; block > end.getX(); block--) {
-                    if (board.board_tiles[block][block].hasPiece()) {
+                for (int block=1; block < Math.abs(moveX); block++) {
+                    if (board.board_tiles[start.getX()-block][start.getY()-block].hasPiece()) {
                         return false;
                     }
                 }
@@ -86,13 +96,14 @@ public abstract class Piece {
                         return false;
                     }
                 }
-            }
-        } else {
-            for (int block = 1; block<moveY; block++) {
-                if (board.board_tiles[start.getX()-block][start.getY()+block].hasPiece()) {
-                    return false;
+            } else {
+                for (int block = 1; block<Math.abs(moveY); block++) {
+                    if (board.board_tiles[start.getX()-block][start.getY()+block].hasPiece()) {
+                        return false;
+                    }
                 }
             }
+            return true;
         }
         return false;
     }
