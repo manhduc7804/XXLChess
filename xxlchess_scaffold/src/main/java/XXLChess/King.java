@@ -10,7 +10,7 @@ public class King extends Piece{
     }
     
     //checking valid move
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(Board board, Logic logic, Tile start, Tile end) {
         if (!end.isValidTile() || !start.isValidTile()) {
             return false;
         }
@@ -27,15 +27,36 @@ public class King extends Piece{
         // castling
         if (firstmove) {
             if (moveX == 0 && moveY == -2 && leftcastling(board)) {
-                return true;
+                logic.setKing(white, end.getX(), end.getY());
+                if (Blocking(board, logic, start, end)) {
+                    logic.setKing(white, start.getX(), start.getY());
+                    return true;
+                } else {
+                    logic.setKing(white, start.getX(), start.getY());
+                    return false;
+                }
             } else if (moveX == 0 && moveY == 2 && rightcastling(board)) {
-                return true;
+                logic.setKing(white, end.getX(), end.getY());
+                if (Blocking(board, logic, start, end)) {
+                    logic.setKing(white, start.getX(), start.getY());
+                    return true;
+                } else {
+                    logic.setKing(white, start.getX(), start.getY());
+                    return false;
+                }
             }
         }
 
         // normal move
         if (Math.abs(moveX) == 1 && Math.abs(moveY) == 1 || Math.abs(moveX) + Math.abs(moveY) == 1) {
-            return true;
+            logic.setKing(white, end.getX(), end.getY());
+            if (Blocking(board, logic, start, end)) {
+                logic.setKing(white, start.getX(), start.getY());
+                return true;
+            } else {
+                logic.setKing(white, start.getX(), start.getY());
+                return false;
+            }
         } 
         return false;
 

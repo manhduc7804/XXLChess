@@ -14,10 +14,18 @@ public class Knight extends Piece{
     }
     
     //checking valid move
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(Board board, Logic logic, Tile start, Tile end) {
         if (!end.isValidTile() || !start.isValidTile()) {
             return false;
         }
-        return KnightCanMove(board, start, end);
+        if (KnightCanMove(board, start, end)) {
+            if (Blocking(board, logic, start, end)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

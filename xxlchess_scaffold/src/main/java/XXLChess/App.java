@@ -51,11 +51,15 @@ public class App extends PApplet {
     public void setup() {
         frameRate(FPS);
 
+        // load config
+        JSONObject conf = loadJSONObject(new File(this.configPath));
+        String layout = conf.getString("layout");
+
         // Load images during setup
         this.board = new Board(this);
         this.logic = new Logic(this, board);
         try {
-            File file = new File("level1.txt");
+            File file = new File(layout);
             Scanner scan = new Scanner(file);
             int i = 0;
             while (scan.hasNextLine()) {
@@ -156,8 +160,6 @@ public class App extends PApplet {
 
         // PImage spr = loadImage("src/main/resources/XXLChess/"+...);
 
-		// load config
-        JSONObject conf = loadJSONObject(new File(this.configPath));
         
     }
 

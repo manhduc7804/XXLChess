@@ -9,8 +9,19 @@ public class Rook extends Piece{
         super(white, img);        
     }
 
-    public boolean canMove(Board board, Tile start, Tile end) {
-        return RookCanMove(board, start, end);
+    public boolean canMove(Board board, Logic logic, Tile start, Tile end) {
+        if (!end.isValidTile() || !start.isValidTile()) {
+            return false;
+        }
+        if (RookCanMove(board, start, end)) {
+            if (Blocking(board, logic, start, end)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
     
 }

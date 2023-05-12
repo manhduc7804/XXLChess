@@ -1,7 +1,5 @@
 package XXLChess;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import processing.core.PApplet;
 import processing.core.PImage;
 

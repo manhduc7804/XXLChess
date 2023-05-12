@@ -34,15 +34,18 @@ public abstract class Piece {
         return this.img;
     }
 
+    // Check if this is the first move
     public boolean IsFisrtMove() {
         return firstmove;
     }
 
+    // set the first move
     public void setFirstMove(boolean firstmove) {
         this.firstmove = firstmove;
     }
 
-    public abstract boolean canMove(Board board, Tile start, Tile end);
+    // An abstract method that will return if the piece can move
+    public abstract boolean canMove(Board board, Logic logic, Tile start, Tile end);
     
     // Knight legal move
     protected boolean KnightCanMove(Board board, Tile start, Tile end) {
@@ -152,5 +155,26 @@ public abstract class Piece {
         }
 
         return false;
+    }
+
+    // Check if the move will get the king out of checked
+    public boolean Blocking(Board board, Logic logic, Tile start, Tile end) {
+        Piece savedpiece;
+        if (board.board_tiles[end.getX()][end.getY()].hasPiece()) {
+            savedpiece = board.board_tiles[end.getX()][end.getY()].getPiece();
+        } else {
+            savedpiece = null;
+        }
+        board.board_tiles[end.getX()][end.getY()].setPiece(board.board_tiles[start.getX()][start.getY()].getPiece());
+        board.board_tiles[start.getX()][start.getY()].setPiece(null);
+        if (logic.ischecked(board, this.white)) {
+            board.board_tiles[start.getX()][start.getY()].setPiece(board.board_tiles[end.getX()][end.getY()].getPiece());
+            board.board_tiles[end.getX()][end.getY()].setPiece(savedpiece);
+            return false;
+        } else {
+            board.board_tiles[start.getX()][start.getY()].setPiece(board.board_tiles[end.getX()][end.getY()].getPiece());
+            board.board_tiles[end.getX()][end.getY()].setPiece(savedpiece);
+            return true;
+        }
     }
 }

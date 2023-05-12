@@ -9,7 +9,7 @@ public class Camel extends Piece{
         super(white, img);
     }
     
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(Board board, Logic logic, Tile start, Tile end) {
          // check if the end tile is the same piece color or not
          if (!end.isValidTile() || !start.isValidTile()) {
             return false;
@@ -24,7 +24,11 @@ public class Camel extends Piece{
         int moveY = Math.abs(end.getY()-start.getY());
 
         if (moveX * moveY == 3) {
-            return true;
+            if (Blocking(board, logic, start, end)) {
+                return true;
+            } else {
+                return false;
+            }
         }
         return false;
     }

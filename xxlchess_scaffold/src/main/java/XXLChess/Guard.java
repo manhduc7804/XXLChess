@@ -11,7 +11,7 @@ public class Guard extends Piece{
     }
     
     //checking valid move
-    public boolean canMove(Board board, Tile start, Tile end) {
+    public boolean canMove(Board board, Logic logic, Tile start, Tile end) {
         if (!end.isValidTile() || !start.isValidTile()) {
             return false;
         }
@@ -23,7 +23,11 @@ public class Guard extends Piece{
         }
         
         if (KnightCanMove(board, start, end)) {
-            return true;
+            if (Blocking(board, logic, start, end)) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
 
@@ -31,7 +35,11 @@ public class Guard extends Piece{
         int moveY = Math.abs(end.getY()-start.getY());
 
         if (moveX == 1 && moveY == 1 || moveX + moveY == 1) {
-            return true;
+            if (Blocking(board, logic, start, end)) {
+                return true;
+            } else {
+                return false;
+            }
         }
         return false;
 
