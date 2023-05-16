@@ -7,7 +7,6 @@ import java.lang.Math;
 
 public abstract class Piece {
     
-    protected final boolean killed = false;
     protected final boolean white;
     protected PImage img;
     protected boolean firstmove;
@@ -25,9 +24,6 @@ public abstract class Piece {
     }
 
     // Set and return if the piece is killed or not
-    public boolean isKilled() {
-        return this.killed;
-    }
     
     // return image
     public PImage getimg() {
@@ -162,18 +158,32 @@ public abstract class Piece {
         Piece savedpiece;
         if (board.board_tiles[end.getX()][end.getY()].hasPiece()) {
             savedpiece = board.board_tiles[end.getX()][end.getY()].getPiece();
+            if (savedpiece instanceof King && savedpiece.isWhite() != white) {
+                return true;
+            }
         } else {
             savedpiece = null;
+        }
+        Piece movingpiece = board.board_tiles[start.getX()][start.getY()].getPiece();
+        if (movingpiece instanceof King) {
+            logic.setKing(this.white, end.getX(), end.getY());
         }
         board.board_tiles[end.getX()][end.getY()].setPiece(board.board_tiles[start.getX()][start.getY()].getPiece());
         board.board_tiles[start.getX()][start.getY()].setPiece(null);
         if (logic.ischecked(board, this.white)) {
             board.board_tiles[start.getX()][start.getY()].setPiece(board.board_tiles[end.getX()][end.getY()].getPiece());
             board.board_tiles[end.getX()][end.getY()].setPiece(savedpiece);
+            if (movingpiece instanceof King) {
+                logic.setKing(this.white, start.getX(), start.getY());
+            }
             return false;
         } else {
             board.board_tiles[start.getX()][start.getY()].setPiece(board.board_tiles[end.getX()][end.getY()].getPiece());
             board.board_tiles[end.getX()][end.getY()].setPiece(savedpiece);
+            // System.out.println(start.getX()+","+start.getY()+" "+end.getX()+","+end.getY()+" "+this.white);
+            if (movingpiece instanceof King) {
+                logic.setKing(this.white, start.getX(), start.getY());
+            }
             return true;
         }
     }

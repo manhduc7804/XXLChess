@@ -97,26 +97,32 @@ public class King extends Piece{
         if (white) {
             if (board.board_tiles[13][13].hasPiece()) {
                 if (!board.board_tiles[13][13].getPiece().IsFisrtMove() || !(board.board_tiles[13][13].getPiece() instanceof Rook)) {
+                    System.out.println(1);
                     return false;
                 }
             } else {
+                System.out.println(2);
                 return false;
             }
-            for (int i=8; i<14; i++) {
+            for (int i=8; i<13; i++) {
                 if (board.board_tiles[13][i].hasPiece()) {
+                    System.out.println(3);
                     return false;
                 }
             }
         } else {
             if (board.board_tiles[0][13].hasPiece()) {
                 if (!board.board_tiles[0][13].getPiece().IsFisrtMove() || !(board.board_tiles[0][13].getPiece() instanceof Rook)) {
+                    System.out.println(4);
                     return false;
                 }
             } else {
+                System.out.println(5);
                 return false;
             }
-            for (int i=8; i<14; i++) {
+            for (int i=8; i<13; i++) {
                 if (board.board_tiles[0][i].hasPiece()) {
+                    System.out.println(6);
                     return false;
                 }
             }

@@ -32,6 +32,11 @@ public class App extends PApplet {
     public String configPath;
     private Board board;
     private Logic logic;
+    private boolean SinglePlayer;
+    private boolean PlayerColor;
+    private int AIspeed;
+    private int countdown;
+    private Movement mv;
 
 
     public App() {
@@ -54,10 +59,39 @@ public class App extends PApplet {
         // load config
         JSONObject conf = loadJSONObject(new File(this.configPath));
         String layout = conf.getString("layout");
+        JSONObject TimeControls = conf.getJSONObject("time_controls");
+        JSONObject player = TimeControls.getJSONObject("player");
+        int PlayerTime = player.getInt("seconds");
+        int PlayerTimeIncrement = player.getInt("increment");
+        JSONObject CPU = TimeControls.getJSONObject("cpu");
+        int CPUTime = CPU.getInt("seconds");
+        int CPUTimeIncrement = CPU.getInt("increment"); 
+        if (conf.getString("player_colour").equals("white")) {
+            PlayerColor = true;
+        } else if (conf.getString("player_colour").equals("black")) {
+            PlayerColor = false;
+        } else {
+            throw new AssertionError("Wrong Colour");
+        }
+        float MovementSpeed = conf.getFloat("piece_movement_speed");
+        int MaxMovementTime = conf.getInt("max_movement_time");
+        int PlayerNumber = conf.getInt("number_of_player");
+        if (PlayerNumber == 1) {
+            SinglePlayer = true;
+        } else if (PlayerNumber == 2) {
+            SinglePlayer = false;
+        } else {
+            throw new AssertionError("Wrong Player Number");
+        }
+        AIspeed = conf.getInt("ai_move_speed");
+        countdown = AIspeed;
+
 
         // Load images during setup
         this.board = new Board(this);
-        this.logic = new Logic(this, board);
+        this.logic = new Logic(this, board, PlayerColor, SinglePlayer);
+        mv = new Movement(this, board, logic, MovementSpeed, MaxMovementTime);
+        logic.setMovement(mv);
         try {
             File file = new File(layout);
             Scanner scan = new Scanner(file);
@@ -156,7 +190,7 @@ public class App extends PApplet {
         } catch (FileNotFoundException e) {
             System.out.println("Error");
         }
-        
+        logic.AIFirstMove();
 
         // PImage spr = loadImage("src/main/resources/XXLChess/"+...);
 
@@ -167,7 +201,9 @@ public class App extends PApplet {
      * Receive key pressed signal from the keyboard.
     */
     public void keyPressed(){
-
+        if (key == 'r' || key == 'R') {
+            setup();
+        }
 
     }
     
@@ -183,8 +219,10 @@ public class App extends PApplet {
         int X = (int) Math.floor(mouseX/CELLSIZE);
         int Y = (int) Math.floor(mouseY/CELLSIZE);
         
-        if (X >=0 && X<14 && Y>=0 && Y<14) {
-            logic.Clicked(Y,X);
+        if (logic.getState()==State.ACTIVE) {
+            if (X >=0 && X<14 && Y>=0 && Y<14) {
+                logic.Clicked(Y,X);
+            }
         }
     }
 
@@ -198,6 +236,20 @@ public class App extends PApplet {
     */
     public void draw() {
         board.draw(this);
+        if (SinglePlayer && logic.getTurn() != PlayerColor && logic.getState() == State.ACTIVE) {
+            if (countdown>0) {
+                countdown = countdown - 1;
+            } else if (countdown == 0) {
+                logic.AITurn();
+                countdown = AIspeed;
+            } 
+        }   
+        if (logic.getState() == State.MOVING) {
+            mv.MoveAnim();
+        } 
+        if (logic.getState() == State.FLASHRED) {
+            logic.FlashRed();
+        }
     }
 	
 	// Add any additional methods or attributes you want. Please put classes in different files.
